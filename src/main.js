@@ -8,7 +8,8 @@ let config = {
     margin: {
         left: 30,
         top: 30
-    }
+    },
+    gutterWidth: 100
 };
 
 let xScale = d3.scale.linear()
@@ -33,20 +34,39 @@ let xAxis = container.append('g')
     );
 
 function render(data) {
+    renderGutter(data);
+    renderBlocks(data);
+}
+
+function renderGutter(data) {
+    let labels = container.selectAll('text.label.gutter')
+        .data(data, (d) => d.id);
+
+    // enter
+    labels.enter().append('svg:text')
+        .attr('class', 'label gutter')
+        .attr('x', xScale(0))
+        .attr('y', (d, i) => (i * 60) + 50/2)
+        .attr('dy', '0.35em')
+        .attr('text-anchor', 'end')
+        .text((d) => d.id);
+}
+
+function renderBlocks(data) {
     // data join
     let blocks = container.selectAll('rect')
         .data(data, (d) => d.id);
 
     // update
     blocks.transition()
-        .attr('x', (d) => d.start)
+        .attr('x', (d) => d.start + config.gutterWidth)
         .duration(1000)
         .ease('elastic');
 
     // enter
     blocks.enter().append('rect')
-        .attr('class', 'square')
-        .attr('x', (d) => d.start)
+        .attr('class', 'block')
+        .attr('x', (d) => d.start + config.gutterWidth)
         .attr('y', (d, i) => i * 60)
         .attr('width', (d) => d.end - d.start)
         .attr('height', 50)
