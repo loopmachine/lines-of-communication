@@ -17,10 +17,7 @@ let xScale = d3.scale.linear()
 
 let svg = d3.select(config.el).append('svg')
     .attr('width', config.width)
-    .attr('height', config.height)
-    .on('click', () => {
-        console.log('clkjvd');
-    });
+    .attr('height', config.height);
 
 let container = svg.append('g')
     .attr('transform', `translate(${config.margin.left}, ${config.margin.top})`);
@@ -35,19 +32,42 @@ let xAxis = container.append('g')
         .tickSize(1)
     );
 
-container.each((d, i) => {
-    console.log(d, i);
-});
+function render(data) {
+    // data join
+    let blocks = container.selectAll('rect')
+        .data(data, (d) => d.id);
 
-let block = container.append('rect')
-    .attr('class', 'square')
-    .attr('x', 100)
-    .attr('y', 100)
-    .attr('width', 200)
-    .attr('height', 200);
+    // update
+    blocks.transition()
+        .attr('x', (d) => d.start)
+        .duration(1000)
+        .ease('elastic');
 
-block.transition()
-    .attr('x', 200)
-    .duration(1000)
-    .ease('elastic');
+    // enter
+    blocks.enter().append('rect')
+        .attr('class', 'square')
+        .attr('x', (d) => d.start)
+        .attr('y', (d, i) => i * 60)
+        .attr('width', (d) => d.end - d.start)
+        .attr('height', 50)
+        .on('click', (d) => {
+            data[0].start = 50;
+            let updatedData = [data[0]];
+            render(updatedData);
+        });
 
+    // exit
+    blocks.exit().remove();
+}
+
+let initialData = [{
+    id: 1,
+    start: 0,
+    end: 100
+}, {
+    id: 2,
+    start: 30,
+    end: 200
+}];
+
+render(initialData);
