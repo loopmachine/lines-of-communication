@@ -1,0 +1,20 @@
+{
+    "name": "d3-experiments",
+    "version": "0.0.1",
+    "dependencies": {
+        "d3": "latest"
+    },
+    "devDependencies": {
+        "babel": "latest",
+        "babel-loader": "latest",
+        "style-loader": "latest",
+        "css-loader": "latest",
+        "less-loader": "latest",
+        "webpack": "latest",
+        "webpack-dev-server": "latest"
+    },
+    "private": true,
+    "scripts": {
+        "start": "webpack-dev-server --port 8000 --hot --devtool eval-source-map --cache --colors --progress"
+    }
+}
