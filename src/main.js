@@ -12,8 +12,24 @@ let config = {
     gutterWidth: 100
 };
 
+let data = [{
+    line: 0,
+    start: 0,
+    end: 20
+}, {
+    line: 1,
+    start: 0,
+    end: 20
+}];
+let key = (d) => `${d.line}:${d.start}:${d.end}`;
+
+function addBlock(block) {
+    data.push(block);
+    render();
+}
+
 let xScale = d3.scale.linear()
-    .domain([0, 0])
+    .domain([0, data.length])     // change to control the initial scale/transition of the x-axis
     .range([0, config.width]);
 
 let svg = d3.select(config.el).append('svg')
@@ -37,9 +53,15 @@ container.append('g')
 function render() {
     renderGutter();
     renderBlocks();
+    rescale();
+}
 
+function rescale() {
     xScale.domain([0, data.length]);
-    d3.transition(container).select('.x.axis')
+    d3.select('.x.axis')
+        .transition()
+        .duration(200)
+        .ease('linear')
         .call(xAxis);
 }
 
@@ -89,25 +111,4 @@ function renderBlocks() {
     blocks.exit().remove();
 }
 
-let data = [];
-let key = (d) => `${d.line}:${d.start}:${d.end}`;
-
-function addBlock(block) {
-    data.push(block);
-
-    d3.transition()
-      .duration(200)
-      .ease('linear')
-      .each(render);
-}
-
-addBlock({
-    line: 0,
-    start: 0,
-    end: 20
-});
-addBlock({
-    line: 1,
-    start: 0,
-    end: 20
-});
+render();
