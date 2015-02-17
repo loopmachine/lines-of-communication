@@ -2,9 +2,9 @@ import d3 from 'd3';
 import './style.less';
 
 let config = {
-    el: 'body',
-    width: 1000,
-    height: 500,
+    el: '#viz',
+    width: 800,
+    height: 300,
     margin: {
         left: 30,
         top: 30
@@ -13,7 +13,7 @@ let config = {
 };
 
 let xScale = d3.scale.linear()
-    .domain([0, 1])
+    .domain([0, 0])
     .range([0, config.width]);
 
 let svg = d3.select(config.el).append('svg')
@@ -23,39 +23,48 @@ let svg = d3.select(config.el).append('svg')
 let container = svg.append('g')
     .attr('transform', `translate(${config.margin.left}, ${config.margin.top})`);
 
-let xAxis = container.append('g')
-    .attr('class', 'axis')
-    .attr('transform', `translate(0, ${config.height - 100})`)
-    .call(d3.svg.axis()
+let xAxis = d3.svg.axis()
         .scale(xScale)
         .orient('bottom')
         .tickFormat((d) => `${d}s`)
         .tickSize(1)
-    );
 
-function render(data) {
-    renderGutter(data);
-    renderBlocks(data);
+container.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', `translate(${config.gutterWidth}, ${config.height - 100})`)
+    .call(xAxis);
+
+function render() {
+    renderGutter();
+    renderBlocks();
+
+    xScale.domain([0, data.length]);
+    d3.transition(container).select('.x.axis')
+        .call(xAxis);
 }
 
-function renderGutter(data) {
+function renderGutter() {
     let labels = container.selectAll('text.label.gutter')
-        .data(data, (d) => d.id);
+        .data(data, key);
 
     // enter
     labels.enter().append('svg:text')
         .attr('class', 'label gutter')
         .attr('x', xScale(0))
-        .attr('y', (d, i) => (i * 60) + 50/2)
-        .attr('dy', '0.35em')
-        .attr('text-anchor', 'end')
-        .text((d) => d.id);
+        .attr('y', (d) => (d.line * 60) + 50/2)
+        .attr('dy', '0.5em')
+        .text((d) => `-- ${d.line} --`)
+        .on('click', (d) => addBlock({
+            line: d.line,
+            start: 120 + (data.length * 20),
+            end: 130 + (data.length * 20)
+        }));
 }
 
-function renderBlocks(data) {
+function renderBlocks() {
     // data join
     let blocks = container.selectAll('rect')
-        .data(data, (d) => d.id);
+        .data(data, key);
 
     // update
     blocks.transition()
@@ -67,7 +76,7 @@ function renderBlocks(data) {
     blocks.enter().append('rect')
         .attr('class', 'block')
         .attr('x', (d) => d.start + config.gutterWidth)
-        .attr('y', (d, i) => i * 60)
+        .attr('y', (d) => d.line * 60)
         .attr('width', (d) => d.end - d.start)
         .attr('height', 50)
         .on('click', (d) => {
@@ -80,14 +89,25 @@ function renderBlocks(data) {
     blocks.exit().remove();
 }
 
-let initialData = [{
-    id: 1,
-    start: 0,
-    end: 100
-}, {
-    id: 2,
-    start: 30,
-    end: 200
-}];
+let data = [];
+let key = (d) => `${d.line}:${d.start}:${d.end}`;
 
-render(initialData);
+function addBlock(block) {
+    data.push(block);
+
+    d3.transition()
+      .duration(200)
+      .ease('linear')
+      .each(render);
+}
+
+addBlock({
+    line: 0,
+    start: 0,
+    end: 20
+});
+addBlock({
+    line: 1,
+    start: 0,
+    end: 20
+});
