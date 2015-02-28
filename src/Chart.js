@@ -15,10 +15,11 @@ export default class Chart {
         this.update();
     }
     init() {
+        let containerWidth = this.config.width - this.config.gutterWidth
+                            - this.config.margin.left - this.config.margin.right;
+
         this.xScale = d3.scale.linear()
-            // change this to control the initial scale/transition of the x-axis
-            .domain([0, this.data.events.length])
-            .range([0, this.config.width]);
+            .range([0, containerWidth]);
 
         let svg = d3.select(this.config.el).append('svg')
             .attr('width', this.config.width)
@@ -29,42 +30,36 @@ export default class Chart {
 
         this.xAxis = d3.svg.axis()
                 .scale(this.xScale)
-                .orient('bottom')
-                .tickFormat((d) => `${d}s`)
+                .orient('top')
+                .tickFormat((d) => `${d}`)
                 .tickSize(1);
 
         this.container.append('g')
             .attr('class', 'x axis')
-            .attr('transform', `translate(${this.config.gutterWidth}, ${this.config.height - 100})`)
+            .attr('transform', `translate(${this.config.gutterWidth}, 0)`)
             .call(this.xAxis);
     }
     /**
      * update the chart with any data changes that have occurred
      */
     update() {
-        let events = this.data.events;
-        this.renderGutter(events);
-        this.renderEvents(events);
-        this.rescale(events);
+        let lanes = this.lanesFrom(this.data.events);
+
+        this.renderGutter(lanes);
+        this.renderEvents(this.data.events);
+        this.rescale(this.data.events);
     }
-    renderGutter(events) {
+    renderGutter(lanes) {
         let labels = this.container.selectAll('text.label.gutter')
-            .data(events, this.eventKey);
+            .data(lanes);
 
         // enter
         labels.enter().append('svg:text')
             .attr('class', 'label gutter')
             .attr('x', this.xScale(0))
-            .attr('y', (d) => (d.line * 60) + 50/2)
+            .attr('y', (d, i) => (i * 60) + 25)
             .attr('dy', '0.5em')
-            .text((d) => `-- ${d.line} --`)
-            .on('click', (d) => this.addEvent({
-                source: 'a',
-                dest: 'b',
-                line: d.line,
-                start: 120 + (events.length * 20),
-                end: 130 + (events.length * 20)
-            }));
+            .text((d) => d);
     }
     renderEvents(events) {
         // data join
@@ -83,20 +78,13 @@ export default class Chart {
             .attr('x', (d) => d.start + this.config.gutterWidth)
             .attr('y', (d) => d.line * 60)
             .attr('width', (d) => d.end - d.start)
-            .attr('height', 50)
-            .on('click', (d) => this.addEvent({
-                source: 'a',
-                dest: 'b',
-                line: d.line,
-                start: 120 + (events.length * 20),
-                end: 130 + (events.length * 20)
-            }));
+            .attr('height', 50);
 
         // exit
         events.exit().remove();
     }
     rescale(events) {
-        this.xScale.domain([0, events.length]);
+        this.xScale.domain([0, d3.max(this.data.events, (event) => event.end)]);
         d3.select('.x.axis')
             .transition()
             .duration(200)
@@ -106,11 +94,11 @@ export default class Chart {
     eventKey(event) {
         return `${event.line}:${event.start}:${event.end}`;
     }
-    uniqueNodes(events) {
-        return events.reduce((nodes, event) => {
-            nodes.add(event.source);
-            nodes.add(event.dest);
-            return nodes;
-        }, new Set());
+    lanesFrom(events) {
+        return Array.from(events.reduce((lanes, event) => {
+            lanes.add(event.source);
+            lanes.add(event.dest);
+            return lanes;
+        }, new Set()));
     }
 }
