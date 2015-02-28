@@ -1,6 +1,8 @@
 import d3 from 'd3';
 import './style.less';
 
+import data from './data.json';
+
 let config = {
     el: '#viz',
     width: 800,
@@ -12,19 +14,11 @@ let config = {
     gutterWidth: 100
 };
 
-let data = [{
-    line: 0,
-    start: 0,
-    end: 20
-}, {
-    line: 1,
-    start: 0,
-    end: 20
-}];
+data = data.events;
 let key = (d) => `${d.line}:${d.start}:${d.end}`;
 
-function addBlock(block) {
-    data.push(block);
+function addEvent(event) {
+    data.push(event);
     render();
 }
 
@@ -52,7 +46,7 @@ container.append('g')
 
 function render() {
     renderGutter();
-    renderBlocks();
+    renderEvents();
     rescale();
 }
 
@@ -76,27 +70,27 @@ function renderGutter() {
         .attr('y', (d) => (d.line * 60) + 50/2)
         .attr('dy', '0.5em')
         .text((d) => `-- ${d.line} --`)
-        .on('click', (d) => addBlock({
+        .on('click', (d) => addEvent({
             line: d.line,
             start: 120 + (data.length * 20),
             end: 130 + (data.length * 20)
         }));
 }
 
-function renderBlocks() {
+function renderEvents() {
     // data join
-    let blocks = container.selectAll('rect')
+    let events = container.selectAll('rect')
         .data(data, key);
 
     // update
-    blocks.transition()
+    events.transition()
         .attr('x', (d) => d.start + config.gutterWidth)
         .duration(1000)
         .ease('elastic');
 
     // enter
-    blocks.enter().append('rect')
-        .attr('class', 'block')
+    events.enter().append('rect')
+        .attr('class', 'event')
         .attr('x', (d) => d.start + config.gutterWidth)
         .attr('y', (d) => d.line * 60)
         .attr('width', (d) => d.end - d.start)
@@ -108,7 +102,7 @@ function renderBlocks() {
         });
 
     // exit
-    blocks.exit().remove();
+    events.exit().remove();
 }
 
 render();

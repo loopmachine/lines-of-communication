@@ -14,6 +14,10 @@ module.exports = {
             exclude: /node_modules/,
             loader: 'babel-loader'
         }, {
+            test: /\.json$/,
+            exclude: /node_modules/,
+            loader: 'json-loader'
+        }, {
             test: /\.less$/,
             exclude: /node_modules/,
             loader: 'style-loader!css-loader!less-loader'

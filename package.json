@@ -7,6 +7,7 @@
     "devDependencies": {
         "babel": "latest",
         "babel-loader": "latest",
+        "json-loader": "latest",
         "style-loader": "latest",
         "css-loader": "latest",
         "less-loader": "latest",
