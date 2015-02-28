@@ -1,9 +1,7 @@
 import d3 from 'd3';
 import './style.less';
 
-import data from './data.json';
-
-let config = {
+const config = {
     el: '#viz',
     width: 800,
     height: 300,
@@ -14,16 +12,31 @@ let config = {
     gutterWidth: 100
 };
 
-data = data.events;
-let key = (d) => `${d.line}:${d.start}:${d.end}`;
+// ----------------------------------------------------------------------------
+
+import data from './data.json';
 
 function addEvent(event) {
-    data.push(event);
+    data.events.push(event);
     render();
 }
 
+// ----------------------------------------------------------------------------
+
+let key = (d) => `${d.line}:${d.start}:${d.end}`;
+
+function getNodes(events) {
+    return events.reduce((nodes, event) => {
+        nodes.add(event.source);
+        nodes.add(event.dest);
+        return nodes;
+    }, new Set());
+}
+
+// ----------------------------------------------------------------------------
+
 let xScale = d3.scale.linear()
-    .domain([0, data.length])     // change to control the initial scale/transition of the x-axis
+    .domain([0, data.events.length])     // change to control the initial scale/transition of the x-axis
     .range([0, config.width]);
 
 let svg = d3.select(config.el).append('svg')
@@ -44,14 +57,17 @@ container.append('g')
     .attr('transform', `translate(${config.gutterWidth}, ${config.height - 100})`)
     .call(xAxis);
 
+// ----------------------------------------------------------------------------
+
 function render() {
-    renderGutter();
-    renderEvents();
-    rescale();
+    let events = data.events;
+    renderGutter(events);
+    renderEvents(events);
+    rescale(events);
 }
 
-function rescale() {
-    xScale.domain([0, data.length]);
+function rescale(events) {
+    xScale.domain([0, events.length]);
     d3.select('.x.axis')
         .transition()
         .duration(200)
@@ -59,9 +75,9 @@ function rescale() {
         .call(xAxis);
 }
 
-function renderGutter() {
+function renderGutter(events) {
     let labels = container.selectAll('text.label.gutter')
-        .data(data, key);
+        .data(events, key);
 
     // enter
     labels.enter().append('svg:text')
@@ -71,16 +87,18 @@ function renderGutter() {
         .attr('dy', '0.5em')
         .text((d) => `-- ${d.line} --`)
         .on('click', (d) => addEvent({
+            source: 'a',
+            dest: 'b',
             line: d.line,
-            start: 120 + (data.length * 20),
-            end: 130 + (data.length * 20)
+            start: 120 + (events.length * 20),
+            end: 130 + (events.length * 20)
         }));
 }
 
-function renderEvents() {
+function renderEvents(events) {
     // data join
     let events = container.selectAll('rect')
-        .data(data, key);
+        .data(events, key);
 
     // update
     events.transition()
@@ -95,14 +113,18 @@ function renderEvents() {
         .attr('y', (d) => d.line * 60)
         .attr('width', (d) => d.end - d.start)
         .attr('height', 50)
-        .on('click', (d) => {
-            data[0].start = 50;
-            let updatedData = [data[0]];
-            render(updatedData);
-        });
+        .on('click', (d) => addEvent({
+            source: 'a',
+            dest: 'b',
+            line: d.line,
+            start: 120 + (events.length * 20),
+            end: 130 + (events.length * 20)
+        }));
 
     // exit
     events.exit().remove();
 }
+
+// ----------------------------------------------------------------------------
 
 render();
