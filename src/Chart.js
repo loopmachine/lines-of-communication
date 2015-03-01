@@ -17,19 +17,12 @@ export default class Chart {
     }
 
     init() {
-        let containerWidth = this.config.width - this.config.gutterWidth
-                            - this.config.margin.left - this.config.margin.right;
+        this.svg = d3.select(this.config.el).append('svg');
 
-        this.xScale = d3.scale.linear()
-            .range([0, containerWidth]);
-
-        let svg = d3.select(this.config.el).append('svg')
-            .attr('width', this.config.width)
-            .attr('height', this.config.height);
-
-        this.container = svg.append('g')
+        this.container = this.svg.append('g')
             .attr('transform', `translate(${this.config.margin.left}, ${this.config.margin.top})`);
 
+        this.xScale = d3.scale.linear();
         this.xAxis = d3.svg.axis()
                 .scale(this.xScale)
                 .orient('top')
@@ -40,6 +33,13 @@ export default class Chart {
             .attr('class', 'x axis')
             .attr('transform', `translate(${this.config.gutterWidth}, 0)`)
             .call(this.xAxis);
+
+        // todo: use config sizes if set instead of sizing to the window
+        d3.select(window).on('resize', () => {
+            this.resize();
+            this.update();
+        });
+        this.resize();
     }
 
     /**
@@ -49,9 +49,9 @@ export default class Chart {
         let events = this.data.events;
         let lanes = this.generateLanes(events);
 
+        this.rescale(events);
         this.renderGutter(lanes);
         this.renderEvents(events, lanes);
-        this.rescale(events);
     }
 
     renderGutter(lanes) {
@@ -74,18 +74,19 @@ export default class Chart {
             .data(events, this.eventKey);
 
         // update
-        events.transition()
-            .attr('x', (d) => d.start + this.config.gutterWidth)
-            .duration(1000)
-            .ease('elastic');
+        events //.transition()
+            .attr('x', (d) => this.xScale(d.start) + this.config.gutterWidth)
+            .attr('width', (d) => this.xScale(d.end - d.start))
+            //.duration(700)
+            //.ease('elastic');
 
         // enter
         events.enter().append('rect')
             .attr('class', 'event')
-            .attr('x', (d) => d.start + this.config.gutterWidth)
+            .attr('x', (d) => this.xScale(d.start) + this.config.gutterWidth)
+            .attr('width', (d) => this.xScale(d.end - d.start))
             // lookup the lane that this event belongs to
             .attr('y', (d) => lanes[d.source].position * (this.config.laneHeight + this.config.laneSpacing))
-            .attr('width', (d) => d.end - d.start)
             .attr('height', this.config.laneHeight);
 
         // exit
@@ -98,10 +99,23 @@ export default class Chart {
     rescale(events) {
         this.xScale.domain([0, d3.max(events, (event) => event.end)]);
         d3.select('.x.axis')
-            .transition()
-            .duration(200)
-            .ease('linear')
+            // .transition()
+            // .duration(200)
+            // .ease('linear')
             .call(this.xAxis);
+    }
+
+    resize() {
+        let width = window.innerWidth,
+            height = window.innerHeight;
+
+        this.svg.attr('width', width).attr('height', height);
+        this.svg.size([width, height]);
+
+        let containerWidth = width - this.config.gutterWidth
+                            - this.config.margin.left - this.config.margin.right;
+
+        this.xScale.range([0, containerWidth]);
     }
 
     /**

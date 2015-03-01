@@ -13,7 +13,7 @@ let chart = new Chart({
         botton: 0
     },
     gutterWidth: 100,
-    laneHeight: 30,
+    laneHeight: 20,
     laneSpacing: 5,
     sortLanes: (lane) => lane.id
 });
