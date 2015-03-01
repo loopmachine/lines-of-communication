@@ -77,7 +77,7 @@ export default class Chart {
             .attr('class', 'label gutter')
             .attr('x', this.xScale(0))
             // center vertically within each position slot
-            .attr('y', (lane) => (lane.position * this.config.laneHeight) + (this.config.laneHeight / 2))
+            .attr('y', (lane) => (lane.position * (this.config.laneHeight + this.config.laneSpacing)) + ((this.config.laneHeight + this.config.laneSpacing) / 2))
             .attr('dy', '0.5em')
             .text((lane) => lane.id);
     }
