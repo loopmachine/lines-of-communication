@@ -1,6 +1,7 @@
 {
     "name": "d3-experiments",
     "version": "0.0.1",
+    "main": "desktop.js",
     "dependencies": {
         "d3": "latest",
         "lodash": "latest"
@@ -13,10 +14,12 @@
         "css-loader": "latest",
         "less-loader": "latest",
         "webpack": "latest",
-        "webpack-dev-server": "latest"
+        "webpack-dev-server": "latest",
+        "html-webpack-plugin": "latest"
     },
     "private": true,
     "scripts": {
-        "start": "webpack-dev-server --port 8000 --hot --devtool eval-source-map --cache --colors --progress"
+        "start": "webpack-dev-server --port 8000 --hot --inline --devtool eval-source-map --cache --colors --progress",
+        "build": "webpack --cache --colors --progress"
     }
 }

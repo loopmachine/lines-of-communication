@@ -1,8 +1,9 @@
 var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        app: ['webpack/hot/dev-server', './src/main.js']
+         app: ['./src/main.js']
     },
     output: {
         path: './dist',
@@ -22,5 +23,8 @@ module.exports = {
             exclude: /node_modules/,
             loader: 'style-loader!css-loader!less-loader'
         }]
-    }
+    },
+    plugins: [new HtmlWebpackPlugin({
+        title: 'd3-experiments'
+    })]
 };

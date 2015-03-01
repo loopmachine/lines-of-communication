@@ -1,6 +1,6 @@
-require('babel/polyfill');
-
 import Chart from './Chart';
+
+createContainerElement('viz');
 
 let chart = new Chart({
     el: '#viz',
@@ -22,3 +22,10 @@ let chart = new Chart({
 import data from './data.json';
 
 chart.render(data);
+
+function createContainerElement(id) {
+    var viz = document.createElement('div');
+    viz.setAttribute('id', 'viz');
+    viz.className = 'viz';
+    document.body.appendChild(viz);
+}

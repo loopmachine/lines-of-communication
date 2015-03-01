@@ -1,16 +1,29 @@
 
-## Install Dependencies
+## Install dependencies
 
 ```
 npm install
 ```
 
-## Build
+
+## Start development server
 
 ```
 npm start
 ```
 
-## Run
-
 http://localhost:8000/webpack-dev-server/
+
+
+## Build application distribution
+
+```
+npm run build
+```
+
+
+## Run application under atom-shell
+
+```
+/path/to/atom .
+```
