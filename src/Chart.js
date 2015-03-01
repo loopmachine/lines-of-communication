@@ -29,7 +29,7 @@ export default class Chart {
                 .tickFormat((label) => `${label}`)
                 .tickSize(1);
 
-        this.colorScale = d3.scale.category20();
+        this.colorScale = d3.scale.category10();
 
         this.container.append('g')
             .attr('class', 'x axis')
@@ -64,7 +64,8 @@ export default class Chart {
 
         this.rescale(events);
         this.renderGutter(lanes);
-        this.renderEvents(events, lanes);
+        this.renderEvents(events, lanes, 'source');
+        this.renderEvents(events, lanes, 'dest');
         this.renderChannels(events, lanes);
     }
 
@@ -82,9 +83,9 @@ export default class Chart {
             .text((lane) => lane.id);
     }
 
-    renderEvents(events, lanes) {
+    renderEvents(events, lanes, sourceOrDest) {
         // data join
-        let events = this.container.selectAll('rect')
+        let events = this.container.selectAll('rect.' + sourceOrDest)
             .data(events, this.eventKey);
 
         // update
@@ -96,11 +97,11 @@ export default class Chart {
 
         // enter
         events.enter().append('svg:rect')
-            .attr('class', 'event')
+            .attr('class', 'event ' + sourceOrDest)
             .attr('fill', (event) => this.colorScale(lanes[event.source].position))
             .attr('x', (event) => this.xScale(event.start) + this.config.gutterWidth)
             .attr('width', (event) => this.xScale(event.end - event.start))
-            .attr('y', (event) => lanes[event.source].position * (this.config.laneHeight + this.config.laneSpacing))
+            .attr('y', (event) => lanes[event[sourceOrDest]].position * (this.config.laneHeight + this.config.laneSpacing))
             .attr('height', this.config.laneHeight);
 
         // exit
