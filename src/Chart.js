@@ -26,8 +26,10 @@ export default class Chart {
         this.xAxis = d3.svg.axis()
                 .scale(this.xScale)
                 .orient('top')
-                .tickFormat((d) => `${d}`)
+                .tickFormat((label) => `${label}`)
                 .tickSize(1);
+
+        this.colorScale = d3.scale.category20();
 
         this.container.append('g')
             .attr('class', 'x axis')
@@ -63,9 +65,9 @@ export default class Chart {
             .attr('class', 'label gutter')
             .attr('x', this.xScale(0))
             // center vertically within each position slot
-            .attr('y', (d) => (d.position * this.config.laneHeight) + (this.config.laneHeight / 2))
+            .attr('y', (lane) => (lane.position * this.config.laneHeight) + (this.config.laneHeight / 2))
             .attr('dy', '0.5em')
-            .text((d) => d.id);
+            .text((lane) => lane.id);
     }
 
     renderEvents(events, lanes) {
@@ -75,18 +77,18 @@ export default class Chart {
 
         // update
         events //.transition()
-            .attr('x', (d) => this.xScale(d.start) + this.config.gutterWidth)
-            .attr('width', (d) => this.xScale(d.end - d.start))
+            .attr('x', (event) => this.xScale(event.start) + this.config.gutterWidth)
+            .attr('width', (event) => this.xScale(event.end - event.start))
             //.duration(700)
             //.ease('elastic');
 
         // enter
         events.enter().append('rect')
             .attr('class', 'event')
-            .attr('x', (d) => this.xScale(d.start) + this.config.gutterWidth)
-            .attr('width', (d) => this.xScale(d.end - d.start))
-            // lookup the lane that this event belongs to
-            .attr('y', (d) => lanes[d.source].position * (this.config.laneHeight + this.config.laneSpacing))
+            .attr('fill', (event) => this.colorScale(lanes[event.source].position))
+            .attr('x', (event) => this.xScale(event.start) + this.config.gutterWidth)
+            .attr('width', (event) => this.xScale(event.end - event.start))
+            .attr('y', (event) => lanes[event.source].position * (this.config.laneHeight + this.config.laneSpacing))
             .attr('height', this.config.laneHeight);
 
         // exit
