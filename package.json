@@ -2,7 +2,8 @@
     "name": "d3-experiments",
     "version": "0.0.1",
     "dependencies": {
-        "d3": "latest"
+        "d3": "latest",
+        "lodash": "latest"
     },
     "devDependencies": {
         "babel": "latest",

@@ -12,7 +12,9 @@ let chart = new Chart({
         top: 30,
         botton: 0
     },
-    gutterWidth: 100
+    gutterWidth: 100,
+    laneHeight: 50,
+    laneSpacing: 0
 });
 
 // load data from somewhere...

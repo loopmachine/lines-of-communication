@@ -2,31 +2,26 @@
     "events": [{
         "source": "a",
         "dest": "b",
-        "line": 0,
         "start": 0,
         "end": 20
     }, {
         "source": "a",
         "dest": "b",
-        "line": 0,
         "start": 25,
         "end": 35
     }, {
         "source": "a",
         "dest": "c",
-        "line": 0,
         "start": 200,
         "end": 300
     }, {
         "source": "b",
         "dest": "a",
-        "line": 1,
         "start": 0,
         "end": 20
     }, {
         "source": "b",
         "dest": "a",
-        "line": 1,
         "start": 40,
         "end": 260
     }]
