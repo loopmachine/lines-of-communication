@@ -36,6 +36,17 @@ export default class Chart {
             .attr('transform', `translate(${this.config.gutterWidth}, 0)`)
             .call(this.xAxis);
 
+        // define markers
+        this.svg.append('svg:defs').append('marker')
+            .attr('id', 'arrowhead')
+            .attr('refX', 4)
+            .attr('refY', 2)
+            .attr('markerWidth', 6)
+            .attr('markerHeight', 4)
+            .attr('orient', 'auto')
+            .append('path')
+                .attr('d', 'M 0,0 V 4 L6,2 Z');
+
         // todo: use config sizes if set instead of sizing to the window
         d3.select(window).on('resize', () => {
             this.resize();
@@ -54,6 +65,7 @@ export default class Chart {
         this.rescale(events);
         this.renderGutter(lanes);
         this.renderEvents(events, lanes);
+        this.renderChannels(events, lanes);
     }
 
     renderGutter(lanes) {
@@ -83,13 +95,56 @@ export default class Chart {
             //.ease('elastic');
 
         // enter
-        events.enter().append('rect')
+        events.enter().append('svg:rect')
             .attr('class', 'event')
             .attr('fill', (event) => this.colorScale(lanes[event.source].position))
             .attr('x', (event) => this.xScale(event.start) + this.config.gutterWidth)
             .attr('width', (event) => this.xScale(event.end - event.start))
             .attr('y', (event) => lanes[event.source].position * (this.config.laneHeight + this.config.laneSpacing))
             .attr('height', this.config.laneHeight);
+
+        // exit
+        events.exit().remove();
+    }
+
+    renderChannels(events, lanes) {
+        // data join
+        let events = this.container.selectAll('line.channel')
+            .data(events, this.eventKey);
+
+        // update
+        events
+            .attr('x1', (event) => this.xScale(event.start) + this.config.gutterWidth)
+            .attr('x2', (event) => this.xScale(event.start) + this.config.gutterWidth);
+
+        // enter
+        events.enter().append('svg:line')
+            .attr('class', 'channel')
+            .attr('x1', (event) => this.xScale(event.start) + this.config.gutterWidth)
+            .attr('y1', (event) => {
+                let sourceLane = lanes[event.source].position;
+                let destLane = lanes[event.dest].position;
+                if (sourceLane < destLane) {
+                    // start channel at the bottom of source
+                    return (sourceLane * (this.config.laneHeight + this.config.laneSpacing)) + this.config.laneHeight;
+                } else {
+                    // start channel at the top of source
+                    return sourceLane * (this.config.laneHeight + this.config.laneSpacing);
+                }
+            })
+            .attr('x2', (event) => this.xScale(event.start) + this.config.gutterWidth)
+            .attr('y2', (event) => {
+                let sourceLane = lanes[event.source].position;
+                let destLane = lanes[event.dest].position;
+                if (sourceLane < destLane) {
+                    // end channel at the top of dest
+                    return destLane * (this.config.laneHeight + this.config.laneSpacing);
+                } else {
+                    // end channel at the bottom of dest
+                    return (destLane * (this.config.laneHeight + this.config.laneSpacing)) + this.config.laneHeight;
+                }
+            })
+            .attr('marker-end', 'url(#arrowhead)');
 
         // exit
         events.exit().remove();
@@ -124,7 +179,7 @@ export default class Chart {
      * unique identifier for each event
      */
     eventKey(event) {
-        return `${event.id}:${event.start}:${event.end}`;
+        return `${event.source}:${event.dest}:${event.start}:${event.end}`;
     }
 
     /**
