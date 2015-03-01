@@ -13,8 +13,8 @@ let chart = new Chart({
         botton: 0
     },
     gutterWidth: 100,
-    laneHeight: 50,
-    laneSpacing: 0
+    laneHeight: 30,
+    laneSpacing: 5
 });
 
 // load data from somewhere...

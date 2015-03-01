@@ -84,7 +84,7 @@ export default class Chart {
             .attr('class', 'event')
             .attr('x', (d) => d.start + this.config.gutterWidth)
             // lookup the lane that this event belongs to
-            .attr('y', (d) => lanes[d.source].position * 60)
+            .attr('y', (d) => lanes[d.source].position * (this.config.laneHeight + this.config.laneSpacing))
             .attr('width', (d) => d.end - d.start)
             .attr('height', this.config.laneHeight);
 
