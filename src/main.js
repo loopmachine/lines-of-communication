@@ -14,7 +14,8 @@ let chart = new Chart({
     },
     gutterWidth: 100,
     laneHeight: 30,
-    laneSpacing: 5
+    laneSpacing: 5,
+    sortLanes: (lane) => lane.id
 });
 
 // load data from somewhere...

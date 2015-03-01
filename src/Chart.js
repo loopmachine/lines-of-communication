@@ -146,13 +146,11 @@ export default class Chart {
      * assign a position index to each lane
      */
     assignLanePositions(lanes) {
-        // by default, order by id
-        let sortedIds = _.keys(lanes).sort();
-
-        sortedIds.forEach((id, i) => {
-            lanes[id]['position'] = i;
+        let sorted = _.sortBy(lanes, this.config.sortLanes);
+        sorted.forEach((lane, i) => {
+            lane['position'] = i;
         });
-        return lanes;
+        return _.indexBy(sorted, 'id');
     }
 
     /**
