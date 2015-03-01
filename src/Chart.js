@@ -27,6 +27,7 @@ export default class Chart {
                 .scale(this.xScale)
                 .orient('top')
                 .tickFormat((label) => `${label}`)
+                .ticks(this.config.ticks)
                 .tickSize(1);
 
         this.colorScale = d3.scale.category20();

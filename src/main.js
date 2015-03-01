@@ -12,6 +12,7 @@ let chart = new Chart({
         top: 30,
         botton: 0
     },
+    ticks: 12,
     gutterWidth: 100,
     laneHeight: 20,
     laneSpacing: 10,
