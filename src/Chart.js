@@ -26,15 +26,15 @@ export default class Chart {
         this.xAxis = d3.svg.axis()
                 .scale(this.xScale)
                 .orient('top')
-                .tickFormat((label) => `${label}`)
                 .ticks(this.config.ticks)
-                .tickSize(1);
+                .tickFormat((label, i) => (i === 0) ? label + 's' : label)
+                .tickSize(-1000, 1);
 
         this.colorScale = d3.scale.category20();
 
         this.container.append('g')
             .attr('class', 'x axis')
-            .attr('transform', `translate(${this.config.gutterWidth}, 0)`)
+            .attr('transform', `translate(${this.config.gutterWidth}, -10)`)
             .call(this.xAxis);
 
         // define markers
@@ -77,7 +77,7 @@ export default class Chart {
         // enter
         labels.enter().append('svg:text')
             .attr('class', 'label gutter')
-            .attr('stroke', (lane) => this.colorScale(lane.position))
+            .attr('fill', (lane) => this.colorScale(lane.position))
             .attr('x', this.xScale(0))
             // center vertically within each position slot
             .attr('y', (lane) => (lane.position * (this.config.laneHeight + this.config.laneSpacing)) + (this.config.laneHeight / 2))

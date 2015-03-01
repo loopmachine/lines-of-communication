@@ -8,17 +8,23 @@
     background-color: #fff;
     font-size: 14px;
 
-    text {
-        fill: #222;
-    }
-
     text.label.gutter {
         cursor: pointer;
+        font-size: 18px;
     }
 
     .x.axis {
-        fill: #777;
-        margin-bottom: 10px;
+        path.domain {
+            fill: #777;
+        }
+        text {
+            fill: #333;
+        }
+        line {
+            stroke: #d9d9d9;
+            shape-rendering: crispEdges;
+            stroke-dasharray: 1,1;
+        }
     }
 
     .event {
@@ -33,6 +39,6 @@
     }
 
     .channel {
-        stroke: #999;
+        stroke: #555;
     }
 }
