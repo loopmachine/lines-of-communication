@@ -1,4 +1,6 @@
 
+![screenshot](https://github.com/loopmachine/lines-of-communication/blob/master/doc/screenshot.png)
+
 ## Install dependencies
 
 ```
