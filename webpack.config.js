@@ -25,6 +25,6 @@ module.exports = {
         }]
     },
     plugins: [new HtmlWebpackPlugin({
-        title: 'd3-experiments'
+        title: 'lines-of-communication'
     })]
 };
